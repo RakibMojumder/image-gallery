@@ -26,6 +26,7 @@ import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 import imageSchema from "@/zod/image-schema"
+import config from "@/config"
 
 interface ImageUploadFormProps {
   open: boolean
@@ -190,7 +191,7 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
     formData.append("api_key", apiKey)
     formData.append("timestamp", timestamp.toString())
     formData.append("signature", signature)
-    formData.append("folder", "image_gallery")
+    formData.append("folder", config.CLOUDINARY_FOLDER as string)
 
     const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
       method: "POST",

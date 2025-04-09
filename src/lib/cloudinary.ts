@@ -1,10 +1,11 @@
 import { v2 as cloudinary } from "cloudinary"
+import config from "@/config"
 
 // Configure Cloudinary
 cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo",
-  api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || "",
-  api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET || "",
+  cloud_name: config.CLOUDINARY_CLOUD_NAME || "demo",
+  api_key: config.CLOUDINARY_API_KEY || "",
+  api_secret: config.CLOUDINARY_API_SECRET || "",
   secure: true,
 })
 
@@ -15,14 +16,14 @@ export const generateSignature = (folder: string, timestamp: number) => {
       timestamp,
       folder,
     },
-    process.env.NEXT_PUBLIC_CLOUDINARY_API_SECRET || "",
+    config.CLOUDINARY_API_SECRET || "",
   )
 
   return {
     signature,
     timestamp,
-    cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || "demo",
-    apiKey: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || "",
+    cloudName: config.CLOUDINARY_CLOUD_NAME || "demo",
+    apiKey: config.CLOUDINARY_API_KEY || "",
   }
 }
 

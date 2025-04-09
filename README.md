@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Image Gallery
 
-## Getting Started
+This project is a simple image gallery built with **TypeScript**, **Next.js**, and **Material UI**. A responsive grid layout allows users to upload, view, and delete images. The gallery integrates Cloudinary to ensure consistency and reliability in managing images.
 
-First, run the development server:
+## Features
+
+- **Image Upload**  
+  - Users can upload an image through the "Upload" button. 
+  - The application integrates with a third-party service, Cloudinary, to handle the storage and management of images.
+
+- **Gallery Display**  
+  - Uploaded images are displayed in a responsive grid format.
+  - Clicking on any image opens a modal to view the image in a larger preview.
+  - A search bar is added in the navbar to allow users to filter images by title or tags.
+
+- **Image Deletion**  
+  - Users can delete images with a confirmation prompt to prevent accidental deletion.
+
+- **Infinite Scroll**  
+  - The gallery supports infinite scrolling for a seamless experience when browsing large numbers of images.
+
+- **Responsive Design**  
+  - The gallery is fully responsive, ensuring it works across different devices and screen sizes.
+
+## Tech Stack
+
+- **TypeScript**: Provides type safety and improves the development process.
+- **Next.js**: A React-based framework for building static and server-rendered applications.
+- **Material UI**: A popular React UI framework for creating clean and modern user interfaces.
+- Cloudinary: Used to manage image uploads and storage seamlessly.
+
+## Live URL
+
+The live URL of this project: https://image-gallary-blue.vercel.app
+
+## Installation
+
+To run the project locally, follow these steps:
+
+Clone the repo:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/RakibMojumder/image-gallery.git
+cd image-gallery
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Install the dependencies:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Set the environment variables:
 
-## Learn More
+```bash
+NEXT_PUBLIC_MONGODB_URI=mongodb+srv://Admin:admin@cluster0.zzty5cj.mongodb.net/image-gallery
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=de4g6jmk4
+NEXT_PUBLIC_CLOUDINARY_API_KEY=693662919513483
+NEXT_PUBLIC_CLOUDINARY_API_SECRET=2s3bMgs2LAcfYp7XtNFpXzF_vzU
+NEXT_PUBLIC_CLOUDINARY_FOLDER=image_gallery
+NEXT_PUBLIC_BLOB_READ_WRITE_TOKEN=vercel_blob_rw_4Z5mSKXQA5A5ois6_yu73VlAeArmnmxN7HmBjtDQFk4R5ru
+NEXT_PUBLIC_PROJECT_URL=http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+Running in development:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+```
