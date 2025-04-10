@@ -1,15 +1,15 @@
-import mongoose, { Schema, type Document } from "mongoose"
+import mongoose, { Schema, type Document } from "mongoose";
 
 export interface IImage extends Document {
-  title: string
-  description?: string
-  url: string
-  publicId?: string
-  tags?: string[]
-  width: number
-  height: number
-  createdAt: Date
-  updatedAt: Date
+  title: string;
+  description?: string;
+  url: string;
+  publicId?: string;
+  tags?: string[];
+  width: number;
+  height: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const ImageSchema = new Schema<IImage>(
@@ -45,15 +45,15 @@ const ImageSchema = new Schema<IImage>(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
 // Add text index for search functionality
 ImageSchema.index({
   title: "text",
   description: "text",
   tags: "text",
-})
+});
 
-export default mongoose.models.Image || mongoose.model<IImage>("Image", ImageSchema)
-
+export default mongoose.models.Image ||
+  mongoose.model<IImage>("Image", ImageSchema);

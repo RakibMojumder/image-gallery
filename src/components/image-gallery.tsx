@@ -26,7 +26,8 @@ export default function ImageGallery({
   const [selectedImage, setSelectedImage] = useState<ImageData | null>(null);
   const [columnCount, setColumnCount] = useState(4);
   const [activeTag, setActiveTag] = useState<string | null>(null);
-  const [showAllTags, setShowAllTags] = useState(false); // State to toggle the visibility of all tags
+  const [showAllTags, setShowAllTags] = useState(false);
+  const [randomizedTags, setRandomizedTags] = useState<string[]>([]);
   const observer = useRef<IntersectionObserver | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
@@ -82,6 +83,33 @@ export default function ImageGallery({
     loadMoreImages();
   }, [page, searchQuery, activeTag]);
 
+  // Get unique tags and randomize them
+  const uniqueTags = useMemo(
+    () => Array.from(new Set(images.flatMap((img) => img.tags || []))),
+    [images]
+  );
+
+  // Randomize tags when uniqueTags changes
+  useEffect(() => {
+    if (uniqueTags.length > 0) {
+      // Create a copy of the array to avoid mutating the original
+      const shuffled = [...uniqueTags];
+      // Fisher-Yates shuffle algorithm
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setRandomizedTags(shuffled);
+    }
+  }, [uniqueTags]);
+
+  // Get tags to display based on showAllTags state
+  const displayedTags = useMemo(() => {
+    return showAllTags
+      ? randomizedTags.slice(0, 50)
+      : randomizedTags.slice(0, 20);
+  }, [randomizedTags, showAllTags]);
+
   // Intersection Observer callback
   const lastImageElementRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -112,12 +140,6 @@ export default function ImageGallery({
       if (observer.current) observer.current.disconnect();
     };
   }, []);
-
-  // Memoized unique tags
-  const uniqueTags = useMemo(
-    () => Array.from(new Set(images.flatMap((img) => img.tags || []))),
-    [images]
-  );
 
   // Memoized breakpoint columns
   const breakpointColumnsObj = useMemo(
@@ -167,7 +189,6 @@ export default function ImageGallery({
     [activeTag, searchQuery]
   );
 
-  // Toggle the visibility of all tags
   const handleSeeMoreTags = () => {
     setShowAllTags((prev) => !prev);
   };
@@ -186,22 +207,19 @@ export default function ImageGallery({
     <>
       {uniqueTags.length > 0 && (
         <Box sx={{ mb: 3, display: "flex", flexWrap: "wrap", gap: 1 }}>
-          {/* Show up to 15 tags, or all if "See More" is clicked */}
-          {uniqueTags
-            .slice(0, showAllTags ? uniqueTags.length : 15)
-            .map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                onClick={() => handleTagClick(tag)}
-                color={activeTag === tag ? "primary" : "default"}
-                variant={activeTag === tag ? "filled" : "outlined"}
-                clickable
-              />
-            ))}
-          {uniqueTags.length > 15 && (
+          {displayedTags.map((tag) => (
             <Chip
-              label={showAllTags ? "See Less" : "See More"}
+              key={tag}
+              label={tag}
+              onClick={() => handleTagClick(tag)}
+              color={activeTag === tag ? "primary" : "default"}
+              variant={activeTag === tag ? "filled" : "outlined"}
+              clickable
+            />
+          ))}
+          {randomizedTags.length > 20 && (
+            <Chip
+              label={showAllTags ? "Show Less" : "Show More"}
               onClick={handleSeeMoreTags}
               color="primary"
               variant="outlined"

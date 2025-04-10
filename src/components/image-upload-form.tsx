@@ -178,11 +178,12 @@ export default function ImageUploadForm({
           height: uploadResult.height,
           publicId: uploadResult.public_id,
         });
+
+        toast.success("Image uploaded successfully!");
       }
 
       router.refresh();
       onClose();
-      toast.success("Image uploaded successfully!");
     } catch (error) {
       console.error("Error during image upload:", error);
       toast.error("Failed to upload image");
