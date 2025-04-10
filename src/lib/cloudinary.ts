@@ -1,5 +1,5 @@
-import { v2 as cloudinary } from "cloudinary"
-import config from "@/config"
+import { v2 as cloudinary } from "cloudinary";
+import config from "@/config";
 
 // Configure Cloudinary
 cloudinary.config({
@@ -7,24 +7,26 @@ cloudinary.config({
   api_key: config.CLOUDINARY_API_KEY || "",
   api_secret: config.CLOUDINARY_API_SECRET || "",
   secure: true,
-})
+});
 
-export const generateSignature = (folder: string, timestamp: number) => {
+export type GenerateSignaturePayload = {
+  timestamp: number;
+  folder?: string;
+  public_id?: string;
+};
 
+export const generateSignature = (payload: GenerateSignaturePayload) => {
   const signature = cloudinary.utils.api_sign_request(
-    {
-      timestamp,
-      folder,
-    },
-    config.CLOUDINARY_API_SECRET || "",
-  )
+    { ...payload },
+    config.CLOUDINARY_API_SECRET || ""
+  );
 
   return {
     signature,
-    timestamp,
+    timestamp: payload.timestamp,
     cloudName: config.CLOUDINARY_CLOUD_NAME || "demo",
     apiKey: config.CLOUDINARY_API_KEY || "",
-  }
-}
+  };
+};
 
-export default cloudinary
+export default cloudinary;

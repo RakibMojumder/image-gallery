@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -12,29 +12,29 @@ import {
   Button,
   Tooltip,
   Container,
-} from "@mui/material"
-import { styled, alpha } from "@mui/material/styles"
-import SearchIcon from "@mui/icons-material/Search"
-import AddIcon from "@mui/icons-material/Add"
-import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useThemeContext } from "@/contexts/theme-context"
-import ImageUploadForm from "./image-upload-form"
-import Image from "next/image"
-import logo from '../../public/images/logo.png'
-import { DarkMode, LightMode } from "@mui/icons-material"
+} from "@mui/material";
+import { styled, alpha } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import AddIcon from "@mui/icons-material/Add";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useThemeContext } from "@/contexts/theme-context";
+import ImageUploadForm from "./image-upload-form";
+import Image from "next/image";
+import logo from "../../public/images/logo.png";
+import { DarkMode, LightMode } from "@mui/icons-material";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
   flexShrink: 0,
   borderRadius: `calc(${theme.shape.borderRadius}px + 8px)`,
-  backdropFilter: 'blur(24px)',
-  border: '1px solid',
+  backdropFilter: "blur(24px)",
+  border: "1px solid",
   backgroundColor: alpha(theme.palette.background.paper, 0.95),
   borderColor: (theme.palette || theme).divider,
-  padding: '4px 12px',
+  // padding: '4px 12px',
 }));
 
 const Search = styled("div")(({ theme }) => ({
@@ -51,7 +51,7 @@ const Search = styled("div")(({ theme }) => ({
     marginLeft: theme.spacing(3),
     width: "auto",
   },
-}))
+}));
 
 const SearchIconWrapper = styled("div")(({ theme }) => ({
   padding: theme.spacing(0, 2),
@@ -61,7 +61,7 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-}))
+}));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
   color: "inherit",
@@ -75,14 +75,14 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
       width: "40ch",
     },
   },
-}))
+}));
 
 export default function Navbar() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [searchValue, setSearchValue] = useState(searchParams.get("q") || "")
-  const [uploadModalOpen, setUploadModalOpen] = useState(false)
-  const { mode, toggleColorMode } = useThemeContext()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchValue, setSearchValue] = useState(searchParams.get("q") || "");
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const { mode, toggleColorMode } = useThemeContext();
 
   // const pathname = usePathname()
   // const isMobile = useMediaQuery(theme.breakpoints.down("sm"))
@@ -97,31 +97,45 @@ export default function Navbar() {
   // }
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (searchValue.trim()) {
-      router.push(`/?q=${encodeURIComponent(searchValue.trim())}`)
-      setSearchValue("")
+      router.push(`/?q=${encodeURIComponent(searchValue.trim())}`);
+      setSearchValue("");
     } else {
-      router.push("/")
+      router.push("/");
     }
-  }
+  };
 
   const handleUploadClick = () => {
-    setUploadModalOpen(true)
-  }
+    setUploadModalOpen(true);
+  };
 
   return (
     <>
-      <AppBar position="fixed" color="default" sx={{
-        boxShadow: 0,
-        bgcolor: 'transparent',
-        backgroundImage: 'none',
-        mt: 2,
-      }}>
+      <AppBar
+        position="fixed"
+        color="default"
+        sx={{
+          boxShadow: 0,
+          bgcolor: "transparent",
+          backgroundImage: "none",
+          mt: 2,
+        }}
+      >
         <Container maxWidth="xl">
-          <StyledToolbar variant="dense" disableGutters>
-            <Link href="/">
-              <Image src={logo} alt="Logo" width={80} height={80} style={{ width: 50, height: 50 }} />
+          <StyledToolbar
+            variant="dense"
+            disableGutters
+            sx={{ padding: { sm: "4px 12px", xs: "8px 0px" } }}
+          >
+            <Link href="/" className="min-w-9 sm:w-[50px] mr-1 sm:mr-0">
+              <Image
+                src={logo}
+                alt="Logo"
+                width={80}
+                height={80}
+                className="size-9 sm:size-[50px]"
+              />
             </Link>
 
             {/* {isMobile ? (
@@ -159,8 +173,19 @@ export default function Navbar() {
               </MenuItem>
             </Menu> */}
 
-            <Box component="form" onSubmit={handleSearch} sx={{ flexGrow: 1, display: "flex" }}>
-              <Search sx={{ backgroundColor: mode === "dark" ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.12)" }}>
+            <Box
+              component="form"
+              onSubmit={handleSearch}
+              sx={{ flexGrow: 1, display: "flex" }}
+            >
+              <Search
+                sx={{
+                  backgroundColor:
+                    mode === "dark"
+                      ? "rgba(0, 0, 0, 0.3)"
+                      : "rgba(0, 0, 0, 0.12)",
+                }}
+              >
                 <SearchIconWrapper>
                   <SearchIcon />
                 </SearchIconWrapper>
@@ -175,7 +200,20 @@ export default function Navbar() {
 
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Tooltip title={mode === "dark" ? "Light mode" : "Dark mode"}>
-                <IconButton size="medium" sx={{ border: "1px solid", borderColor: mode === "dark" ? "rgba(255, 255, 255, 0.2)" : "rgba(0, 0, 0, 0.2)", borderRadius: 1.5, p: '6px 8px' }} onClick={toggleColorMode} color="inherit">
+                <IconButton
+                  size="medium"
+                  sx={{
+                    border: "1px solid",
+                    borderColor:
+                      mode === "dark"
+                        ? "rgba(255, 255, 255, 0.2)"
+                        : "rgba(0, 0, 0, 0.2)",
+                    borderRadius: 1.5,
+                    p: { sm: "6px 8px", xs: "4px" },
+                  }}
+                  onClick={toggleColorMode}
+                  color="inherit"
+                >
                   {mode === "dark" ? <LightMode /> : <DarkMode />}
                 </IconButton>
               </Tooltip>
@@ -212,7 +250,7 @@ export default function Navbar() {
                   ml: 1,
                   mr: 1,
                   borderRadius: 1.5,
-                  p: '5px 8px',
+                  p: { sm: "6px 8px", xs: "4px" },
                   border: "1px solid",
                 }}
               >
@@ -225,8 +263,12 @@ export default function Navbar() {
         </Container>
       </AppBar>
 
-      {uploadModalOpen && <ImageUploadForm open={uploadModalOpen} onClose={() => setUploadModalOpen(false)} />}
+      {uploadModalOpen && (
+        <ImageUploadForm
+          open={uploadModalOpen}
+          onClose={() => setUploadModalOpen(false)}
+        />
+      )}
     </>
-  )
+  );
 }
-

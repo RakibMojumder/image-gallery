@@ -1,8 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import type React from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,76 +13,85 @@ import {
   Chip,
   Avatar,
   Divider,
-} from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew"
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
-import FavoriteIcon from "@mui/icons-material/Favorite"
-import ShareIcon from "@mui/icons-material/Share"
-import DownloadIcon from "@mui/icons-material/Download"
-import type { ImageData } from "@/lib/types"
-import Image from "next/image"
-import { handleDownloadImage } from "@/lib/utils"
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import ShareIcon from "@mui/icons-material/Share";
+import DownloadIcon from "@mui/icons-material/Download";
+import type { ImageData } from "@/lib/types";
+import Image from "next/image";
+import { handleDownloadImage } from "@/lib/utils";
 
 interface ImagePreviewModalProps {
-  open: boolean
-  image: ImageData | null
-  onClose: () => void
-  images: ImageData[]
-  onTagClick?: (tag: string) => void
+  open: boolean;
+  image: ImageData | null;
+  onClose: () => void;
+  images: ImageData[];
+  onTagClick?: (tag: string) => void;
 }
 
-export default function ImagePreviewModal({ open, image, onClose, images, onTagClick }: ImagePreviewModalProps) {
-  const theme = useTheme()
-  const fullScreen = useMediaQuery(theme.breakpoints.down("md"))
-  const [currentIndex, setCurrentIndex] = useState(0)
+export default function ImagePreviewModal({
+  open,
+  image,
+  onClose,
+  images,
+  onTagClick,
+}: ImagePreviewModalProps) {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (image) {
-      const index = images.findIndex((img) => img.id === image.id)
+      const index = images.findIndex((img) => img.id === image.id);
       if (index !== -1) {
-        setCurrentIndex(index)
+        setCurrentIndex(index);
       }
     }
-  }, [image, images])
+  }, [image, images]);
 
   const handlePrevious = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1))
-  }
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
 
   const handleNext = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0))
-  }
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+  };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "ArrowLeft") {
-      handlePrevious(e as unknown as React.MouseEvent)
+      handlePrevious(e as unknown as React.MouseEvent);
     } else if (e.key === "ArrowRight") {
-      handleNext(e as unknown as React.MouseEvent)
+      handleNext(e as unknown as React.MouseEvent);
     } else if (e.key === "Escape") {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const handleTagClick = (tag: string) => {
     if (onTagClick) {
-      onTagClick(tag)
-      onClose()
+      onTagClick(tag);
+      onClose();
     }
-  }
+  };
 
-  const currentImage = images[currentIndex]
+  const currentImage = images[currentIndex];
 
-  if (!open || !currentImage) return null
+  if (!open || !currentImage) return null;
 
   // Format date
-  const formattedDate = new Date(currentImage.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  })
+  const formattedDate = new Date(currentImage.createdAt).toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
 
   return (
     <Dialog
@@ -125,7 +133,14 @@ export default function ImagePreviewModal({ open, image, onClose, images, onTagC
         </IconButton>
       </Box>
 
-      <DialogContent sx={{ p: 0, display: "flex", flexDirection: { xs: "column", md: "row" }, overflow: "hidden" }}>
+      <DialogContent
+        sx={{
+          p: 0,
+          display: "flex",
+          flexDirection: { xs: "column", md: "row" },
+          overflow: "hidden",
+        }}
+      >
         <Box
           sx={{
             position: "relative",
@@ -234,7 +249,13 @@ export default function ImagePreviewModal({ open, image, onClose, images, onTagC
               </Typography>
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1, mb: 3 }}>
                 {currentImage.tags.map((tag) => (
-                  <Chip key={tag} label={tag} size="small" onClick={() => handleTagClick(tag)} clickable />
+                  <Chip
+                    key={tag}
+                    label={tag}
+                    size="small"
+                    onClick={() => handleTagClick(tag)}
+                    clickable
+                  />
                 ))}
               </Box>
             </>
@@ -246,10 +267,12 @@ export default function ImagePreviewModal({ open, image, onClose, images, onTagC
           <Typography variant="body2">
             Dimensions: {currentImage.width} × {currentImage.height} px
           </Typography>
-          <Typography variant="body2">Aspect ratio: {(currentImage.width / currentImage.height).toFixed(2)}</Typography>
+          <Typography variant="body2">
+            Aspect ratio:{" "}
+            {(currentImage.width / currentImage.height).toFixed(2)}
+          </Typography>
         </Box>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

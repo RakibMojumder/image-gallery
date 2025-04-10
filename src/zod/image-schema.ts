@@ -23,7 +23,7 @@ const imageSchema = z.object({
     z.string().url().optional(), // Allow URL (image URL) in edit mode
   ]).optional(),
 }).refine(data => data.file || data.file === "", {
-  message: "Image file or URL is required",
+  message: "Image file is required",
   path: ["file"]
 });
 

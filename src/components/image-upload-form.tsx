@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react";
 import {
   Box,
   Button,
@@ -14,40 +14,47 @@ import {
   IconButton,
   InputAdornment,
   Chip,
-} from "@mui/material"
-import CloudUploadIcon from "@mui/icons-material/CloudUpload"
-import ClearIcon from "@mui/icons-material/Clear"
-import AddIcon from "@mui/icons-material/Add"
-import { updateImage, addImage } from "@/lib/actions"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import type { ImageData } from "@/lib/types"
-import { useForm, Controller } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { toast } from "sonner"
-import imageSchema from "@/zod/image-schema"
-import config from "@/config"
+} from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import ClearIcon from "@mui/icons-material/Clear";
+import AddIcon from "@mui/icons-material/Add";
+import { updateImage, addImage } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import type { ImageData } from "@/lib/types";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import imageSchema from "@/zod/image-schema";
+import { deleteImageFromCloudinary, uploadToCloudinary } from "@/lib/utils";
 
 interface ImageUploadFormProps {
-  open: boolean
-  onClose: () => void
-  editMode?: boolean
-  imageData?: ImageData
+  open: boolean;
+  onClose: () => void;
+  editMode?: boolean;
+  imageData?: ImageData;
 }
 
 type FormValues = {
-  title: string
-  description?: string
-  tags: string[]
-  file?: File | string
-  currentTag?: string
-}
+  title: string;
+  description?: string;
+  tags: string[];
+  file?: File | string;
+  currentTag?: string;
+};
 
-export default function ImageUploadForm({ open, onClose, editMode = false, imageData }: ImageUploadFormProps) {
-  const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(imageData?.url || null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export default function ImageUploadForm({
+  open,
+  onClose,
+  editMode = false,
+  imageData,
+}: ImageUploadFormProps) {
+  const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    imageData?.url || null
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
@@ -66,22 +73,22 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
       currentTag: "",
     },
     mode: "onChange",
-  })
+  });
 
-  const tags = watch("tags")
+  const tags = watch("tags");
   const file = watch("file");
-  const currentTag = watch("currentTag")
+  const currentTag = watch("currentTag");
 
   // Handle file changes and preview
   useEffect(() => {
     if (file && typeof file !== "string") {
-      const url = URL.createObjectURL(file)
-      setPreviewUrl(url)
-      return () => URL.revokeObjectURL(url)
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+      return () => URL.revokeObjectURL(url);
     } else if (!editMode) {
-      setPreviewUrl(null)
+      setPreviewUrl(null);
     }
-  }, [file, editMode])
+  }, [file, editMode]);
 
   // Reset form when opening/closing or when imageData changes
   useEffect(() => {
@@ -92,43 +99,43 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
         tags: imageData?.tags || [],
         file: imageData?.url || undefined,
         currentTag: "",
-      })
-      setPreviewUrl(imageData?.url || null)
+      });
+      setPreviewUrl(imageData?.url || null);
     }
-  }, [open, imageData, reset])
+  }, [open, imageData, reset]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      setValue("file", e.target.files[0], { shouldValidate: true })
+      setValue("file", e.target.files[0], { shouldValidate: true });
     }
-  }
+  };
 
   const clearImage = () => {
-    setValue("file", undefined, { shouldValidate: true })
-    setPreviewUrl(null)
+    setValue("file", undefined, { shouldValidate: true });
+    setPreviewUrl(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = "";
     }
-  }
+  };
 
   const handleAddTag = () => {
     if (currentTag?.trim() && !tags.includes(currentTag.trim())) {
-      setValue("tags", [...tags, currentTag.trim()], { shouldValidate: true })
-      setValue("currentTag", "", { shouldValidate: false })
+      setValue("tags", [...tags, currentTag.trim()], { shouldValidate: true });
+      setValue("currentTag", "", { shouldValidate: false });
     }
-  }
+  };
 
   const handleRemoveTag = (tagToRemove: string) => {
     setValue(
       "tags",
       tags.filter((tag) => tag !== tagToRemove),
       { shouldValidate: true }
-    )
-  }
+    );
+  };
 
   const onSubmit = async (data: FormValues) => {
     try {
-      setIsSubmitting(true)
+      setIsSubmitting(true);
 
       if (editMode && imageData) {
         // Edit mode logic
@@ -137,29 +144,31 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
           title: data.title,
           description: data.description,
           tags: data.tags,
-        }
+        };
 
         if (data.file && typeof data.file !== "string") {
+          // delete file from cloudinary
+          await deleteImageFromCloudinary(imageData?.publicId as string);
           // Upload new file to Cloudinary
-          const uploadResult = await uploadToCloudinary(data.file)
+          const uploadResult = await uploadToCloudinary(data.file);
           updatedImageData = {
             ...updatedImageData,
             url: uploadResult.secure_url,
             publicId: uploadResult.public_id,
             width: uploadResult.width,
             height: uploadResult.height,
-          }
+          };
         }
 
-        await updateImage(updatedImageData as ImageData)
-        toast.success("Image updated successfully!")
+        await updateImage(updatedImageData as ImageData);
+        toast.success("Image updated successfully!");
       } else {
         // New image upload - file is required here
         if (!data.file || typeof data.file === "string") {
-          throw new Error("Image file is required")
+          throw new Error("Image file is required");
         }
 
-        const uploadResult = await uploadToCloudinary(data.file)
+        const uploadResult = await uploadToCloudinary(data.file);
         await addImage({
           url: uploadResult.secure_url,
           title: data.title,
@@ -168,53 +177,31 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
           width: uploadResult.width,
           height: uploadResult.height,
           publicId: uploadResult.public_id,
-        })
+        });
       }
 
-      router.refresh()
-      onClose()
-      toast.success("Image uploaded successfully!")
+      router.refresh();
+      onClose();
+      toast.success("Image uploaded successfully!");
     } catch (error) {
-      console.error("Error during image upload:", error)
-      toast.error("Failed to upload image")
+      console.error("Error during image upload:", error);
+      toast.error("Failed to upload image");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
-
-  const uploadToCloudinary = async (file: File) => {
-    const response = await fetch("/api/cloudinary/signature")
-    const { signature, timestamp, cloudName, apiKey } = await response.json();
-
-    const formData = new FormData()
-    formData.append("file", file)
-    formData.append("api_key", apiKey)
-    formData.append("timestamp", timestamp.toString())
-    formData.append("signature", signature)
-    formData.append("folder", config.CLOUDINARY_FOLDER as string)
-
-    const uploadResponse = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-      method: "POST",
-      body: formData,
-    })
-
-    if (!uploadResponse.ok) {
-      throw new Error("Failed to upload image")
-    }
-
-    return uploadResponse.json()
-  }
+  };
 
   return (
-    <Dialog
-      open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{editMode ? "Edit Image" : "Upload New Image"}</DialogTitle>
-      <DialogContent sx={{
-        overflowX: 'hidden',
-        '& > *': {
-          maxWidth: '100%' // Ensure all children don't overflow
-        }
-      }}>
+      <DialogContent
+        sx={{
+          overflowX: "hidden",
+          "& > *": {
+            maxWidth: "100%", // Ensure all children don't overflow
+          },
+        }}
+      >
         <Box component="form" onSubmit={handleSubmit(onSubmit)}>
           <Box
             sx={{
@@ -267,9 +254,17 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
                 }}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <CloudUploadIcon sx={{ fontSize: 48, color: "text.secondary", mb: 2 }} />
-                <Typography variant="body1">Click to select an image</Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                <CloudUploadIcon
+                  sx={{ fontSize: 48, color: "text.secondary", mb: 2 }}
+                />
+                <Typography variant="body1">
+                  Click to select an image
+                </Typography>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{ mt: 1 }}
+                >
                   PNG, JPG, WEBP up to 5MB
                 </Typography>
               </Box>
@@ -283,7 +278,12 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
               required={!editMode}
             />
             {errors.file && (
-              <Typography color="error" variant="caption" display="block" sx={{ mt: 1 }}>
+              <Typography
+                color="error"
+                variant="caption"
+                display="block"
+                sx={{ mt: 1 }}
+              >
                 {errors.file.message}
               </Typography>
             )}
@@ -302,23 +302,86 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
                 disabled={isSubmitting}
                 error={!!errors.title}
                 helperText={errors.title?.message}
-                InputProps={{
-                  endAdornment: field.value ? (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="clear title"
-                        onClick={() => field.onChange("")}
-                        edge="end"
-                        disabled={isSubmitting}
-                      >
-                        <ClearIcon />
-                      </IconButton>
-                    </InputAdornment>
-                  ) : null,
+                slotProps={{
+                  input: {
+                    endAdornment: field.value ? (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="clear title"
+                          onClick={() => field.onChange("")}
+                          edge="end"
+                          disabled={isSubmitting}
+                        >
+                          <ClearIcon />
+                        </IconButton>
+                      </InputAdornment>
+                    ) : null,
+                  },
                 }}
               />
             )}
           />
+
+          <Box sx={{ mt: 2 }}>
+            <Controller
+              name="currentTag"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  required
+                  label="Add Tags"
+                  disabled={isSubmitting}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            edge="end"
+                            onClick={handleAddTag}
+                            disabled={!currentTag?.trim() || isSubmitting}
+                          >
+                            <AddIcon />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+              )}
+            />
+
+            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
+              {tags.map((tag, index) => (
+                <Chip
+                  key={index}
+                  label={tag}
+                  onDelete={() => handleRemoveTag(tag)}
+                  disabled={isSubmitting}
+                  variant="outlined"
+                  color="primary"
+                  size="small"
+                />
+              ))}
+            </Box>
+            {errors.tags && (
+              <Typography
+                color="error"
+                variant="caption"
+                display="block"
+                sx={{ mt: 1 }}
+              >
+                {errors.tags.message}
+              </Typography>
+            )}
+          </Box>
 
           <Controller
             name="description"
@@ -349,57 +412,6 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
               />
             )}
           />
-
-          <Box sx={{ mt: 2 }}>
-            <Controller
-              name="currentTag"
-              control={control}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  fullWidth
-                  label="Add Tags"
-                  disabled={isSubmitting}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      e.preventDefault()
-                      handleAddTag()
-                    }
-                  }}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          edge="end"
-                          onClick={handleAddTag}
-                          disabled={!currentTag?.trim() || isSubmitting}
-                        >
-                          <AddIcon />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              )}
-            />
-
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mt: 1 }}>
-              {tags.map((tag, index) => (
-                <Chip
-                  key={index}
-                  label={tag}
-                  onDelete={() => handleRemoveTag(tag)}
-                  disabled={isSubmitting}
-                  size="small"
-                />
-              ))}
-            </Box>
-            {errors.tags && (
-              <Typography color="error" variant="caption" display="block" sx={{ mt: 1 }}>
-                {errors.tags.message}
-              </Typography>
-            )}
-          </Box>
         </Box>
       </DialogContent>
 
@@ -415,9 +427,13 @@ export default function ImageUploadForm({ open, onClose, editMode = false, image
           onClick={handleSubmit(onSubmit)}
           startIcon={isSubmitting ? <CircularProgress size={20} /> : null}
         >
-          {isSubmitting ? "Processing..." : editMode ? "Save Changes" : "Upload Image"}
+          {isSubmitting
+            ? "Processing..."
+            : editMode
+            ? "Save Changes"
+            : "Upload Image"}
         </Button>
       </DialogActions>
     </Dialog>
-  )
+  );
 }

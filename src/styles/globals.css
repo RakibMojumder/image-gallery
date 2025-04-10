@@ -11,6 +11,20 @@
 }
 
 .masonry-grid-item {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   break-inside: avoid;
+}
+
+/* For small screens (mobile devices) */
+@media (max-width: 600px) {
+  .masonry-grid-item {
+    margin-bottom: 12px;
+  }
+}
+
+/* For tablets (portrait orientation) */
+@media (max-width: 768px) {
+  .masonry-grid-item {
+    margin-bottom: 16px;
+  }
 }
